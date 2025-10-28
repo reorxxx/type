@@ -415,6 +415,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const typedChar = typedText.slice(-1);
         const targetChar = characters[currentIndex].textContent; // Use textContent for reliability
 
+        // --- Virtual Keyboard Feedback ---
+        const keyElement = document.querySelector(`.key[data-key='${typedChar.toLowerCase()}']`);
+        if (keyElement) {
+            keyElement.classList.add('active');
+            setTimeout(() => {
+                keyElement.classList.remove('active');
+            }, 150); // Visual feedback duration
+        }
+        // --------------------------------
+
         if (typedChar === targetChar) {
             // Correct key press
             const currentSpan = characters[currentIndex];
@@ -499,6 +509,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 keyElement.classList.add('key');
                 keyElement.innerText = keyInfo.text;
                 keyElement.setAttribute('data-code', keyInfo.code);
+                keyElement.setAttribute('data-key', keyInfo.text.toLowerCase()); // Add this for character-based selection
                 keyElement.style.flexGrow = keyInfo.flexGrow || 1;
                 rowElement.appendChild(keyElement);
             });
