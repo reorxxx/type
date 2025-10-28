@@ -14,6 +14,11 @@
     --key-hover-bg: rgba(255, 255, 255, 0.2);
 }
 
+html {
+    /* Set a responsive font size with min and max limits */
+    font-size: clamp(10px, 1.5vw, 16px);
+}
+
 body {
     background-color: var(--bg-color);
     color: var(--text-color);
@@ -27,14 +32,14 @@ body {
 
 .container {
     width: 90%;
-    max-width: 800px;
+    max-width: 50rem; /* 800px / 16px */
     text-align: center;
 }
 
 .stats {
     display: flex;
     justify-content: space-around;
-    margin-bottom: 40px;
+    margin-bottom: 2.5rem; /* 40px / 16px */
     font-size: 1.5rem;
 }
 
@@ -45,14 +50,14 @@ body {
 
 #text-display {
     font-size: 1.8rem;
-    margin-bottom: 40px;
+    margin-bottom: 2.5rem; /* 40px / 16px */
     line-height: 1.6;
-    letter-spacing: 1px;
+    letter-spacing: 0.0625rem; /* 1px / 16px */
 }
 
 #text-display span {
-    padding: 2px 1px;
-    border-radius: 3px;
+    padding: 0.125rem 0.0625rem; /* 2px 1px */
+    border-radius: 0.1875rem; /* 3px / 16px */
 }
 
 #text-display .current {
@@ -71,23 +76,23 @@ body {
 
 #input-area {
     position: absolute;
-    width: 1px;
-    height: 1px;
+    width: 0.0625rem; /* 1px */
+    height: 0.0625rem; /* 1px */
     padding: 0;
-    margin: -1px;
+    margin: -0.0625rem; /* -1px */
     overflow: hidden;
     clip: rect(0, 0, 0, 0);
     border: 0;
 }
 
 #keyboard {
-    margin: 40px 0;
+    margin: 2.5rem 0; /* 40px / 16px */
     width: 100%;
 }
 
 .keyboard-row {
     display: flex;
-    margin-bottom: 8px;
+    margin-bottom: 0.5rem; /* 8px / 16px */
 }
 
 .keyboard-row:nth-child(2) { }
@@ -97,15 +102,15 @@ body {
 
 .key {
     background-color: var(--key-bg);
-    border-radius: 5px;
+    border-radius: 0.3125rem; /* 5px / 16px */
     text-align: center;
     text-transform: capitalize;
     transition: all 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 15px 0;
-    margin: 0 4px;
+    padding: 0.9375rem 0; /* 15px / 16px */
+    margin: 0 0.25rem; /* 4px / 16px */
     flex-grow: 1;
     flex-basis: 0;
     font-size: 1rem;
@@ -120,9 +125,9 @@ body {
     background-color: var(--primary-color);
     color: var(--text-color);
     border: none;
-    padding: 15px 30px;
+    padding: 0.9375rem 1.875rem; /* 15px 30px */
     font-size: 1.2rem;
-    border-radius: 5px;
+    border-radius: 0.3125rem; /* 5px / 16px */
     cursor: pointer;
     transition: background-color 0.3s;
 }
