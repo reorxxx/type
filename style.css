@@ -1,0 +1,494 @@
+:root {
+    --bg-color: #2c3e50;
+    --text-color: #ecf0f1;
+    --primary-color: #e74c3c; /* Red for corrected errors */
+    --error-underline-color: #e74c3c; /* Keep underline red */
+    --correct-color: #2ecc71;
+    --incorrect-color: #f1c40f; /* Yellow for errors */
+    --key-bg: rgba(255, 255, 255, 0.1);
+    --key-hover-bg: rgba(255, 255, 255, 0.2);
+}
+
+html {
+    /* Set a responsive font size with min and max limits */
+    font-size: clamp(10px, 1.5vw, 16px);
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Align container to the top for natural scrolling */
+    min-height: 100vh;
+    margin: 0;
+}
+
+.container {
+    width: 90%;
+    max-width: 60rem; /* Widen for better layout */
+    margin: 0 auto;
+    text-align: center;
+    opacity: 0; /* Initially hidden to prevent FOUC */
+    transition: opacity 0.4s ease-in-out; /* Smooth fade-in */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Can grow taller than the viewport, enabling scroll */
+    padding: 1rem 0;
+    box-sizing: border-box;
+    position: relative; /* Set positioning context */
+}
+
+.container.loaded {
+    opacity: 1; /* Visible when content is ready */
+}
+
+.stats {
+    display: flex;
+    justify-content: space-around;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+.typing-area {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+#text-display {
+    line-height: 1.6;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Center content horizontally */
+    align-items: center; /* Center single lines vertically */
+    gap: 0.5rem;
+    position: relative;
+    color: var(--text-color);
+    align-content: center; /* Center multiple lines vertically as a block */
+    min-height: 0; /* Allow the element to shrink smaller than its content */
+    padding-bottom: 2rem; /* Align to bottom of midline */
+}
+
+.bottom-panel {
+    flex-shrink: 0;
+    width: 100%; /* Ensure it takes full width */
+    position: relative; /* Set as positioning context */
+}
+
+
+
+/* == Base styles for all modes == */
+#text-display span {
+    display: inline-block; /* Use inline-block for better spacing control */
+    font-size: 2rem;
+    transition: all 0.2s ease;
+    position: relative;
+    color: var(--text-color);
+    will-change: transform;
+    padding-top: 0.2rem; /* Vertical padding only */
+    padding-bottom: 0.2rem;
+    margin: 0; /* Remove margin, rely on natural spacing or gap */
+    border-bottom: 4px solid transparent; /* Default underline */
+}
+
+/* The inner span holding the letter should not have its own border/underline */
+#text-display .letter {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+/* == Styles for Words Mode == */
+#text-display:not(.letters-mode) {
+    justify-content: center; /* Center the whole text block */
+    gap: 0; /* Remove gap to connect underlines */
+}
+
+#text-display:not(.letters-mode) .word {
+    display: inline-flex; /* Group words and prevent them from breaking */
+}
+
+#text-display:not(.letters-mode) .word > span {
+    display: inline-flex; /* Use flex to center content */
+    justify-content: center; /* Center the letter within the fixed-width span */
+    align-items: center; /* Vertically center the letter */
+    width: 1.5rem; /* Set a fixed width for every character box */
+    font-family: 'Courier New', Courier, monospace; /* Use a monospaced font for consistent width */
+    border-bottom-style: solid; /* Ensure underline is always solid */
+    border-bottom-color: var(--key-bg);
+    padding-left: 0;
+    padding-right: 0;
+}
+
+/* The background for any character that has been typed */
+#text-display:not(.letters-mode) .typed-char {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* The cursor/active character */
+#text-display:not(.letters-mode) span.active-char {
+    border-bottom-color: #3498db;
+    box-shadow: none;
+}
+
+/* Correctly typed characters */
+#text-display:not(.letters-mode) .correct {
+    border-bottom-color: var(--correct-color);
+    color: var(--text-color); /* Keep text color normal */
+}
+
+/* Incorrectly typed characters - text and underline are red, with a red background */
+#text-display:not(.letters-mode) .incorrect {
+    color: var(--error-underline-color);
+    border-bottom-color: var(--error-underline-color);
+    background-color: rgba(231, 76, 60, 0.25); /* Reddish background for error */
+}
+
+/* A previously incorrect character that has been corrected */
+#text-display:not(.letters-mode) .corrected-error {
+    color: var(--primary-color); /* Red text for corrected errors */
+    border-bottom-color: var(--primary-color); /* Keep underline red to mark historical error */
+}
+
+/* Ensure spaces that are marked incorrect also get a solid red underline */
+#text-display:not(.letters-mode) span.space.incorrect {
+    border-bottom-style: solid;
+    border-bottom-color: var(--error-underline-color);
+}
+
+
+/* == Styles for Letters Mode (retains the boxy look) == */
+.letters-row {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+#text-display.letters-mode span {
+    display: inline-flex; /* Overrides the base inline-block */
+    justify-content: center;
+    align-items: center;
+    width: 2.8rem;
+    height: 3.2rem;
+    border: 2px solid var(--key-bg);
+    border-bottom-width: 4px;
+    border-radius: 0.5rem;
+    margin: 0.2rem;
+    padding: 0; /* Override padding from base span */
+}
+
+#text-display.letters-mode span.space {
+    border-style: dashed;
+    width: 1.2rem;
+    min-width: 1.2rem;
+}
+
+#text-display.letters-mode span.active-char {
+    border-color: #3498db;
+    box-shadow: 0 0 8px rgba(52, 152, 219, 0.7);
+}
+
+#text-display.letters-mode .correct {
+    border-color: var(--correct-color);
+}
+
+#text-display.letters-mode .incorrect {
+    border-color: var(--incorrect-color);
+    background-color: rgba(241, 196, 15, 0.1);
+}
+
+#text-display.letters-mode span.space.incorrect {
+    border-style: solid;
+    border-color: var(--error-underline-color);
+}
+
+#text-display.letters-mode .corrected-error {
+    color: var(--primary-color);
+    border-color: var(--key-bg);
+}
+
+/* Animations for character feedback */
+@keyframes correct-bing {
+    0% { transform: scale(1); }
+    25% { transform: scale(1.05); } /* Peak at 0.05s (25% of 0.2s) */
+    100% { transform: scale(1); }
+}
+
+@keyframes incorrect-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); }
+}
+
+.correct-bing {
+    animation: correct-bing 0.2s ease-out; /* Total duration 0.2s */
+}
+
+.incorrect-shake {
+    animation: incorrect-shake 0.2s ease;
+}
+
+.start-prompt {
+    position: absolute;
+    bottom: 100%; /* Align bottom of prompt to top of parent */
+    margin-bottom: 0.1rem; /* Add the small gap */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    font-size: 1.2rem;
+    color: var(--text-color);
+    opacity: 1;
+    transition: opacity 0.3s ease;
+    height: 1.5rem; /* Allocate space to prevent layout shift */
+}
+
+.start-prompt.hidden {
+    opacity: 0;
+}
+
+.start-prompt .highlight {
+    font-weight: bold;
+    color: var(--primary-color); /* Red to stand out */
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.back-btn {
+    position: fixed;
+    top: 1.5rem;
+    left: 1.5rem;
+    z-index: 101;
+    background-color: var(--key-bg);
+    color: var(--text-color);
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+    background-color: var(--key-hover-bg);
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+
+#input-area {
+    position: absolute;
+    width: 0.0625rem; /* 1px */
+    height: 0.0625rem; /* 1px */
+    padding: 0;
+    margin: -0.0625rem; /* -1px */
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+#keyboard {
+    margin: 0 auto;
+    width: 66.67%;
+    transform: scale(0.9); /* Scale down the entire keyboard */
+    transform-origin: center;
+    opacity: 0.6; /* Make the keyboard more transparent */
+}
+
+.keyboard-row {
+    display: flex;
+    margin-bottom: 0.3rem; /* Reduced */
+}
+
+.keyboard-row:nth-child(2) { }
+.keyboard-row:nth-child(3) { }
+.keyboard-row:nth-child(4) { }
+
+
+.key {
+    background-color: var(--key-bg);
+    border-radius: 0.3125rem; /* 5px / 16px */
+    text-align: center;
+    text-transform: capitalize;
+    transition: all 0.07s ease-out; /* Faster transition for key press */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.7rem 0; /* Reduced */
+    margin: 0 0.15rem; /* Reduced */
+    flex-grow: 1;
+    flex-basis: 0;
+    font-size: 0.85rem; /* Reduced */
+    box-shadow: 0 3px 0 rgba(0,0,0,0.4); /* Add a 3D effect */
+    position: relative;
+}
+
+.key-pressed {
+    background-color: var(--key-hover-bg);
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 rgba(0,0,0,0.4);
+}
+
+.next-key-hint {
+    background-color: rgba(52, 152, 219, 0.5);
+    box-shadow: 0 3px 0 rgba(0,0,0,0.4);
+}
+
+.btn {
+    color: var(--text-color);
+    border: none;
+    padding: 0.9rem 1.8rem;
+    font-size: 1.2rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+    font-weight: bold;
+    display: inline-block;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.4);
+}
+
+.btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: #c0392b;
+}
+
+.btn-success {
+    background-color: var(--correct-color);
+}
+
+.btn-success:hover {
+    background-color: #27ae60;
+}
+
+.v-hidden {
+    visibility: hidden;
+}
+
+/* Summary Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: var(--bg-color);
+    padding: 3rem;
+    border-radius: 1.5rem;
+    text-align: center;
+    width: 90%;
+    max-width: 30rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transform: scale(0.8);
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    border: 4px solid transparent; /* Base border */
+}
+
+.modal-overlay.visible .modal-content {
+    transform: scale(1);
+}
+
+.modal-content h2 {
+    font-size: 2.5rem;
+    color: var(--correct-color);
+    margin-bottom: 1rem;
+}
+
+.modal-content .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin: 2rem 0;
+    font-size: 1.2rem;
+}
+
+.summary-item .value {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--text-color);
+}
+
+.summary-item .label {
+    font-size: 1rem;
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+
+
+#summary-title {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    font-weight: bold;
+}
+
+#summary-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-color);
+    opacity: 0.8;
+    margin-top: -0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Performance Level Border Styles */
+.modal-content.level-1  { border-color: #e74c3c; box-shadow: 0 0 20px rgba(231, 76, 60, 0.4); }
+.modal-content.level-2  { border-color: #e67e22; box-shadow: 0 0 20px rgba(230, 126, 34, 0.4); }
+.modal-content.level-3  { border-color: #f1c40f; box-shadow: 0 0 20px rgba(241, 196, 15, 0.4); }
+.modal-content.level-4  { border-color: #2ecc71; box-shadow: 0 0 20px rgba(46, 204, 113, 0.4); }
+.modal-content.level-5  { border-color: #1abc9c; box-shadow: 0 0 20px rgba(26, 188, 156, 0.4); }
+.modal-content.level-6  { border-color: #3498db; box-shadow: 0 0 20px rgba(52, 152, 219, 0.4); }
+.modal-content.level-7  { border-color: #9b59b6; box-shadow: 0 0 20px rgba(155, 89, 182, 0.4); }
+.modal-content.level-8  { border-color: #ecf0f1; box-shadow: 0 0 25px rgba(236, 240, 241, 0.5); }
+.modal-content.level-9  { border-color: #f39c12; box-shadow: 0 0 30px rgba(243, 156, 18, 0.6); }
+.modal-content.level-10 { 
+    border-color: #f1c40f; 
+    box-shadow: 0 0 40px rgba(241, 196, 15, 0.8);
+}

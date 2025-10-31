@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Pro - 练习</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a href="index.html" class="back-btn">←</a>
+    <div class="container">
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="wpm">0</div>
+                <div class="stat-label">速度 (字/分)</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="accuracy">100%</div>
+                <div class="stat-label">准确率</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="time">0s</div>
+                <div class="stat-label">时间</div>
+            </div>
+        </div>
+
+        <div class="typing-area">
+            <div id="text-display">
+            </div>
+            <div class="bottom-panel">
+                <div id="start-prompt" class="start-prompt"></div>
+                <div id="keyboard"></div>
+                <div class="controls">
+                    <button id="restart-btn" class="btn btn-primary">重新开始</button>
+                </div>
+            </div>
+        </div>
+        <input type="text" id="input-area" autofocus>
+    </div>
+
+    <div id="summary-modal" class="modal-overlay">
+        <div id="summary-content" class="modal-content">
+            <div id="summary-title"></div>
+            <div id="summary-subtitle"></div>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div id="summary-wpm" class="value">0</div>
+                    <div class="label">速度 (字/分)</div>
+                </div>
+                <div class="summary-item">
+                    <div id="summary-accuracy" class="value">100%</div>
+                    <div class="label">准确率</div>
+                </div>
+                <div class="summary-item">
+                    <div id="summary-time" class="value">0s</div>
+                    <div class="label">时间</div>
+                </div>
+            </div>
+            <button id="summary-restart-btn" class="btn btn-success">再来一次</button>
+        </div>
+    </div>
+    <script src="keyboard.js"></script>
+    <script src="ui.js"></script>
+    <script src="modes.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>

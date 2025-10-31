@@ -3,551 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Typing Pro</title>
+    <title>Typing Pro - 选择练习模式</title>
     <style>
-:root {
-    --bg-color: #2c3e50;
-    --text-color: #ecf0f1;
-    --primary-color: #e74c3c; /* Red for corrected errors */
-    --error-underline-color: #e74c3c; /* Keep underline red */
-    --correct-color: #2ecc71;
-    --incorrect-color: #f1c40f; /* Yellow for errors */
-    --key-bg: rgba(255, 255, 255, 0.1);
-    --key-hover-bg: rgba(255, 255, 255, 0.2);
-}
+        :root {
+            --bg-color: #2c3e50;
+            --text-color: #ecf0f1;
+            --key-bg: rgba(255, 255, 255, 0.1);
+            --key-hover-bg: rgba(255, 255, 255, 0.2);
+            --disabled-opacity: 0.5;
+        }
 
-html {
-    /* Set a responsive font size with min and max limits */
-    font-size: clamp(10px, 1.5vw, 16px);
-}
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
 
-body {
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
-}
+        .container {
+            width: 90%;
+            max-width: 60rem;
+        }
 
-.container {
-    width: 90%;
-    max-width: 50rem; /* 800px / 16px */
-    text-align: center;
-}
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
 
-.stats {
-    display: flex;
-    justify-content: space-around;
-    margin-bottom: 1.5rem; /* Reduced */
-    font-size: 1.5rem;
-}
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+            opacity: 0.8;
+        }
 
-.stat-value {
-    font-size: 2.5rem;
-    font-weight: bold;
-}
+        .mode-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
 
-#text-display {
-    font-size: 1.8rem;
-    margin-bottom: 1.5rem; /* Reduced */
-    line-height: 1.6;
-    letter-spacing: 0.0625rem; /* 1px / 16px */
-}
+        .mode-card {
+            background-color: var(--key-bg);
+            color: var(--text-color);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid transparent;
+        }
 
-#text-display.letters-mode {
-    line-height: 1.8; /* Adjust line height for two rows */
-}
+        .mode-card:hover {
+            transform: translateY(-5px);
+            background-color: var(--key-hover-bg);
+            border-color: var(--text-color);
+        }
 
-#text-display span {
-    padding: 0.125rem 0.0625rem; /* 2px 1px */
-    border-radius: 0.1875rem; /* 3px */
-}
+        .mode-card.disabled {
+            opacity: var(--disabled-opacity);
+            cursor: not-allowed;
+            transform: none;
+            background-color: var(--key-bg);
+            border-color: transparent;
+        }
 
-#text-display.letters-mode span {
-    display: inline-block;
-    text-align: center;
-    vertical-align: middle;
-    width: 1.5rem;
-    height: 1.8rem;
-    line-height: 1.8rem;
-}
+        .mode-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
 
-#text-display span.space.current {
-    min-width: 0.5rem; /* Make space background visible */
-}
+        .mode-title {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
 
-#text-display .current {
-    background-color: var(--primary-color);
-    color: var(--bg-color);
-    border-radius: 0.1875rem; /* 3px */
-}
-
-#text-display .correct {
-    color: var(--correct-color);
-}
-
-#text-display .incorrect {
-    color: var(--incorrect-color);
-}
-
-#text-display span.space.incorrect {
-    border-bottom: 2px solid var(--primary-color); /* Red underline for incorrect space */
-}
-
-
-#text-display .corrected-error {
-    color: var(--primary-color); /* Red for corrected errors */
-}
-
-.start-prompt {
-    margin: 1.5rem 0; /* Add vertical spacing */
-    font-size: 1.2rem;
-    color: var(--text-color);
-    opacity: 1;
-    transition: opacity 0.3s ease;
-    height: 1.5rem; /* Allocate space to prevent layout shift */
-}
-
-.start-prompt.hidden {
-    opacity: 0;
-}
-
-.start-prompt .highlight {
-    font-weight: bold;
-    color: var(--primary-color); /* Red to stand out */
-}
-
-.main-modes {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-top: 2rem;
-}
-
-.main-mode-btn {
-    background-color: var(--key-bg);
-    color: var(--text-color);
-    border: 2px solid transparent;
-    border-radius: 0.5rem;
-    padding: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 8rem; /* Increased size */
-    height: 8rem; /* Increased size */
-    position: relative;
-    overflow: hidden;
-    opacity: 0.6; /* Dimmed by default */
-}
-
-.main-mode-btn.active {
-    opacity: 1; /* Bright when active */
-}
-
-.main-mode-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-}
-
-.main-mode-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: 0.5rem;
-    padding: 2px;
-    background: transparent;
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: destination-out;
-    mask-composite: exclude;
-    transition: background 0.3s ease;
-}
-
-.main-mode-btn.active::before {
-    background: white; /* White border */
-    box-shadow: 0 0 1rem rgba(255, 255, 255, 0.5); /* White glow */
-}
-
-.main-mode-icon {
-    font-size: 2rem; /* Increased size */
-    margin-bottom: 0.75rem; /* Adjusted spacing */
-}
-
-.main-mode-title {
-    font-weight: bold;
-    font-size: 1.1rem; /* Increased size */
-}
-
-.main-mode-subtitle {
-    font-size: 0.85rem; /* Increased size */
-    opacity: 0.7;
-    margin-top: 0.25rem;
-}
-
-#input-area {
-    position: absolute;
-    width: 0.0625rem; /* 1px */
-    height: 0.0625rem; /* 1px */
-    padding: 0;
-    margin: -0.0625rem; /* -1px */
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    border: 0;
-}
-
-#keyboard {
-    margin: 2.5rem 0; /* 40px / 16px */
-    width: 100%;
-}
-
-.keyboard-row {
-    display: flex;
-    margin-bottom: 0.4rem; /* Reduced */
-}
-
-.keyboard-row:nth-child(2) { }
-.keyboard-row:nth-child(3) { }
-.keyboard-row:nth-child(4) { }
-
-
-.key {
-    background-color: var(--key-bg);
-    border-radius: 0.3125rem; /* 5px / 16px */
-    text-align: center;
-    text-transform: capitalize;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.8rem 0; /* Reduced */
-    margin: 0 0.2rem; /* Reduced */
-    flex-grow: 1;
-    flex-basis: 0;
-    font-size: 0.9rem; /* Reduced */
-}
-
-.key.active {
-    background-color: var(--primary-color);
-    transform: scale(1.1);
-}
-
-#restart-btn {
-    background-color: var(--primary-color);
-    color: var(--text-color);
-    border: none;
-    padding: 0.9375rem 1.875rem;
-    font-size: 1.2rem;
-    border-radius: 0.3125rem;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    margin-bottom: 2rem;
-}
-
-#restart-btn:hover {
-    background-color: #c0392b;
-}
+        .mode-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-top: 0.5rem;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="stats">
-            <div class="stat-item">
-                <div class="stat-value" id="wpm">0</div>
-                <div class="stat-label">WPM</div>
+        <h1>Typing Pro</h1>
+        <p class="subtitle">选择一个模式开始您的打字练习</p>
+        <div class="mode-grid">
+            <a href="practice.html?mode=letters_ordered" class="mode-card">
+                <div class="mode-icon">🔠</div>
+                <div class="mode-title">字母顺序练习</div>
+                <div class="mode-subtitle">a-z</div>
+            </a>
+            <a href="practice.html?mode=letters_random" class="mode-card">
+                <div class="mode-icon">🔀</div>
+                <div class="mode-title">字母乱序练习</div>
+                <div class="mode-subtitle">随机 a-z</div>
+            </a>
+            <a href="practice.html?mode=words" class="mode-card">
+                <div class="mode-icon">📖</div>
+                <div class="mode-title">英文短句</div>
+                <div class="mode-subtitle">随机句子</div>
+            </a>
+            <div class="mode-card disabled">
+                <div class="mode-icon">🗣️</div>
+                <div class="mode-title">拼音练习</div>
+                <div class="mode-subtitle">敬请期待</div>
             </div>
-            <div class="stat-item">
-                <div class="stat-value" id="accuracy">100%</div>
-                <div class="stat-label">Accuracy</div>
+            <div class="mode-card disabled">
+                <div class="mode-icon">📚</div>
+                <div class="mode-title">绘本故事</div>
+                <div class="mode-subtitle">敬请期待</div>
             </div>
-            <div class="stat-item">
-                <div class="stat-value" id="time">0s</div>
-                <div class="stat-label">Time</div>
+            <div class="mode-card disabled">
+                <div class="mode-icon">🎮</div>
+                <div class="mode-title">打字游戏</div>
+                <div class="mode-subtitle">敬请期待</div>
             </div>
-        </div>
-        <div id="start-prompt" class="start-prompt"></div>
-        <div id="text-display"></div>
-        <input type="text" id="input-area" autofocus>
-        <div id="keyboard"></div>
-        <button id="restart-btn">Restart</button>
-        <div class="main-modes">
-            <button class="main-mode-btn active" data-mode="letters">
-                <div class="main-mode-icon">🖐️</div>
-                <div class="main-mode-title">指法学习</div>
-                <div class="main-mode-subtitle">马上试试</div>
-            </button>
-            <button class="main-mode-btn" data-mode="words">
-                <div class="main-mode-icon">📖</div>
-                <div class="main-mode-title">单词练习</div>
-                <div class="main-mode-subtitle">随机单词</div>
-            </button>
-             <button class="main-mode-btn" data-mode="coming-soon" disabled>
-                <div class="main-mode-icon">✨</div>
-                <div class="main-mode-title">更多模式</div>
-                <div class="main-mode-subtitle">敬请期待</div>
-            </button>
         </div>
     </div>
-    <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const textDisplay = document.getElementById('text-display');
-    const inputArea = document.getElementById('input-area');
-    const wpmElement = document.getElementById('wpm');
-    const accuracyElement = document.getElementById('accuracy');
-    const timeElement = document.getElementById('time');
-    const keyboard = document.getElementById('keyboard');
-    const mainModesContainer = document.querySelector('.main-modes');
-    const restartBtn = document.getElementById('restart-btn');
-    const startPrompt = document.getElementById('start-prompt');
-
-    const wordSamples = [
-        "the quick brown fox jumps over the lazy dog",
-        "a journey of a thousand miles begins with a single step",
-        "all that glitters is not gold",
-        "curiosity killed the cat",
-        "every cloud has a silver lining",
-        "fortune favors the bold",
-        "good things come to those who wait",
-        "honesty is the best policy",
-        "if it is not broke do not fix it",
-        "knowledge is power",
-        "laughter is the best medicine",
-        "actions speak louder than words",
-        "practice makes perfect",
-        "the early bird catches the worm",
-        "where there is a will there is a way",
-        "you cannot judge a book by its cover",
-        "the pen is mightier than the sword",
-        "when in rome do as the romans do",
-        "two heads are better than one",
-        "when the going gets tough the tough get going"
-    ];
-    
-    let characters = [];
-    let currentIndex = 0;
-    let startTime;
-    let timer;
-    let errorCount = 0;
-    let correctlyTypedString = "";
-    let erroredIndices = new Set();
-    let currentMode = 'letters'; // 'letters', 'words', or 'custom'
-
-    function startNewTest() {
-        clearInterval(timer);
-        textDisplay.innerHTML = '';
-        inputArea.value = '';
-        characters = []; // Reset characters array
-
-        // Handle class for different modes
-        if (currentMode === 'letters') {
-            textDisplay.classList.add('letters-mode');
-        } else {
-            textDisplay.classList.remove('letters-mode');
-        }
-
-        if (currentMode === 'letters') {
-            const letterRows = ["abcdefghijklm", "nopqrstuvwxyz"];
-            letterRows.forEach((row, index) => {
-                const rowChars = row.split('').map(char => {
-                    const span = document.createElement('span');
-                    span.textContent = char;
-                    textDisplay.appendChild(span);
-                    return span;
-                });
-                characters.push(...rowChars);
-                if (index < letterRows.length - 1) {
-                    textDisplay.appendChild(document.createElement('br'));
-                }
-            });
-        } else { // For words mode
-            const text = wordSamples[Math.floor(Math.random() * wordSamples.length)];
-            characters = text.split('').map(char => {
-                const span = document.createElement('span');
-                span.textContent = char;
-                if (char === ' ') {
-                    span.classList.add('space');
-                }
-                textDisplay.appendChild(span);
-                return span;
-            });
-        }
-
-        if (characters.length > 0) {
-            characters[0].classList.add('current');
-            const firstChar = characters[0].textContent;
-            const promptText = firstChar === ' ' ? '空格' : firstChar;
-            startPrompt.innerHTML = `请输入字母 <span class="highlight">${promptText}</span> 开始计时`;
-            startPrompt.classList.remove('hidden');
-        } else {
-            startPrompt.classList.add('hidden');
-        }
-
-        currentIndex = 0;
-        startTime = null;
-        errorCount = 0;
-        correctlyTypedString = "";
-        erroredIndices.clear();
-        wpmElement.innerText = '0';
-        accuracyElement.innerText = '100%';
-        timeElement.innerText = '0.00s';
-        inputArea.focus();
-    }
-
-    function handleInput() {
-        if (currentIndex >= characters.length) {
-            return; // Test is finished
-        }
-
-        if (!startTime) {
-            startTime = new Date();
-            timer = setInterval(updateTime, 10);
-            startPrompt.classList.add('hidden'); // Hide prompt on first input
-        }
-
-        const typedText = inputArea.value;
-        const typedChar = typedText.slice(-1);
-        const targetChar = characters[currentIndex].textContent; // Use textContent for reliability
-
-        // --- Virtual Keyboard Feedback ---
-        const keyElement = document.querySelector(`.key[data-key='${typedChar.toLowerCase()}']`);
-        if (keyElement) {
-            keyElement.classList.add('active');
-            setTimeout(() => {
-                keyElement.classList.remove('active');
-            }, 150); // Visual feedback duration
-        }
-        // --------------------------------
-
-        if (typedChar === targetChar) {
-            // Correct key press
-            const currentSpan = characters[currentIndex];
-            const wasErrored = erroredIndices.has(currentIndex);
-            const isSpace = currentSpan.classList.contains('space');
-
-            // If it's a space that was corrected, we leave the 'incorrect' class on it
-            // so it keeps the red border. For all other correct characters, we apply
-            // the normal green/red text color logic.
-            if (!isSpace || !wasErrored) {
-                currentSpan.classList.remove('incorrect'); // Remove yellow for non-spaces
-                if (wasErrored) {
-                    currentSpan.classList.add('corrected-error'); // Corrected letter -> red text
-                } else {
-                    currentSpan.classList.add('correct'); // Correct from the start -> green text
-                }
-            }
-            
-            currentSpan.classList.remove('current');
-
-            correctlyTypedString += typedChar;
-            currentIndex++;
-
-            if (currentIndex < characters.length) {
-                characters[currentIndex].classList.add('current');
-            } else {
-                endTest();
-            }
-        } else {
-            // Incorrect key press
-            characters[currentIndex].classList.add('incorrect'); // Current error (yellow)
-            if (!erroredIndices.has(currentIndex)) {
-                errorCount++;
-                erroredIndices.add(currentIndex);
-            }
-            inputArea.value = correctlyTypedString; // Reject the wrong input
-        }
-        
-        updateStats();
-    }
-
-    function updateStats() {
-        const elapsedTime = (new Date() - startTime) / 1000;
-        if (elapsedTime > 0) {
-            const wpm = Math.round(((currentIndex / 5) / elapsedTime) * 60);
-            wpmElement.innerText = wpm;
-        }
-        const totalPresses = currentIndex + errorCount;
-        const accuracy = totalPresses > 0 ? Math.round((currentIndex / totalPresses) * 100) : 100;
-        accuracyElement.innerText = `${accuracy}%`;
-    }
-
-    function updateTime() {
-        const elapsedTime = (new Date() - startTime) / 1000;
-        timeElement.innerText = `${elapsedTime.toFixed(2)}s`;
-    }
-
-    function endTest() {
-        clearInterval(timer);
-        inputArea.blur();
-    }
-
-    function createKeyboard() {
-        const keysLayout = [
-            // Row 1
-            [{ code: 'Backquote', text: '`' }, { code: 'Digit1', text: '1' }, { code: 'Digit2', text: '2' }, { code: 'Digit3', text: '3' }, { code: 'Digit4', text: '4' }, { code: 'Digit5', text: '5' }, { code: 'Digit6', text: '6' }, { code: 'Digit7', text: '7' }, { code: 'Digit8', text: '8' }, { code: 'Digit9', text: '9' }, { code: 'Digit0', text: '0' }, { code: 'Minus', text: '-' }, { code: 'Equal', text: '=' }, { code: 'Backspace', text: 'Backspace', flexGrow: 2 }],
-            // Row 2
-            [{ code: 'Tab', text: 'Tab', flexGrow: 1.5 }, { code: 'KeyQ', text: 'Q' }, { code: 'KeyW', text: 'W' }, { code: 'KeyE', text: 'E' }, { code: 'KeyR', text: 'R' }, { code: 'KeyT', text: 'T' }, { code: 'KeyY', text: 'Y' }, { code: 'KeyU', text: 'U' }, { code: 'KeyI', text: 'I' }, { code: 'KeyO', text: 'O' }, { code: 'KeyP', text: 'P' }, { code: 'BracketLeft', text: '[' }, { code: 'BracketRight', text: ']' }, { code: 'Backslash', text: '\\', flexGrow: 1.5 }],
-            // Row 3
-            [{ code: 'CapsLock', text: 'CapsLock', flexGrow: 1.75 }, { code: 'KeyA', text: 'A' }, { code: 'KeyS', text: 'S' }, { code: 'KeyD', text: 'D' }, { code: 'KeyF', text: 'F' }, { code: 'KeyG', text: 'G' }, { code: 'KeyH', text: 'H' }, { code: 'KeyJ', text: 'J' }, { code: 'KeyK', text: 'K' }, { code: 'KeyL', text: 'L' }, { code: 'Semicolon', text: ';' }, { code: 'Quote', text: "'" }, { code: 'Enter', text: 'Enter', flexGrow: 2.25 }],
-            // Row 4
-            [{ code: 'ShiftLeft', text: 'Shift', flexGrow: 2.25 }, { code: 'KeyZ', text: 'Z' }, { code: 'KeyX', text: 'X' }, { code: 'KeyC', text: 'C' }, { code: 'KeyV', text: 'V' }, { code: 'KeyB', text: 'B' }, { code: 'KeyN', text: 'N' }, { code: 'KeyM', text: 'M' }, { code: 'Comma', text: ',' }, { code: 'Period', text: '.' }, { code: 'Slash', text: '/' }, { code: 'ShiftRight', text: 'Shift', flexGrow: 2.75 }],
-            // Row 5
-            [{ code: 'ControlLeft', text: 'Ctrl', flexGrow: 1.25 }, { code: 'AltLeft', text: 'Alt', flexGrow: 1.25 }, { code: 'Space', text: ' ', flexGrow: 6.25 }, { code: 'AltRight', text: 'Alt', flexGrow: 1.25 }, { code: 'ControlRight', text: 'Ctrl', flexGrow: 1.25 }]
-        ];
-
-        keysLayout.forEach(row => {
-            const rowElement = document.createElement('div');
-            rowElement.classList.add('keyboard-row');
-            row.forEach(keyInfo => {
-                const keyElement = document.createElement('div');
-                keyElement.classList.add('key');
-                keyElement.innerText = keyInfo.text;
-                keyElement.setAttribute('data-code', keyInfo.code);
-                keyElement.setAttribute('data-key', keyInfo.text.toLowerCase()); // Add this for character-based selection
-                keyElement.style.flexGrow = keyInfo.flexGrow || 1;
-                rowElement.appendChild(keyElement);
-            });
-            keyboard.appendChild(rowElement);
-        });
-    }
-    
-    mainModesContainer.addEventListener('click', (e) => {
-        const clickedButton = e.target.closest('.main-mode-btn:not(:disabled)');
-        if (!clickedButton) return;
-
-        mainModesContainer.querySelector('.active').classList.remove('active');
-        clickedButton.classList.add('active');
-        currentMode = clickedButton.dataset.mode;
-        startNewTest();
-    });
-
-    restartBtn.addEventListener('click', startNewTest);
-    inputArea.addEventListener('input', handleInput);
-
-    document.addEventListener('keydown', (e) => {
-        inputArea.focus();
-        const keyElement = document.querySelector(`.key[data-code='${e.code}']`);
-        if (keyElement) {
-            keyElement.classList.add('active');
-        }
-    });
-
-    document.addEventListener('keyup', (e) => {
-        const keyElement = document.querySelector(`.key[data-code='${e.code}']`);
-        if (keyElement) {
-            keyElement.classList.remove('active');
-        }
-    });
-
-    createKeyboard();
-    startNewTest();
-});
-    </script>
 </body>
 </html>
