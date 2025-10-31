@@ -84,9 +84,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function processCorrectChar($span, typedChar) {
         const wasErrored = erroredIndices.has(currentIndex);
-        $span.addClass('typed-char').removeClass('incorrect incorrect-shake');
+        
+        // Clean up all competing classes first
+        $span.addClass('typed-char').removeClass('incorrect incorrect-shake correct');
+        
+        // Add animation
         $span.find('.letter').addBack($span).addClass('correct-bing');
         
+        // Apply the correct final state class
         if (wasErrored) {
             $span.addClass('corrected-error');
         } else {
@@ -119,7 +124,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const elapsedTime = (new Date() - startTime) / 1000;
         const wpm = calculateWPM(elapsedTime);
         const accuracy = calculateAccuracy();
-        showSummary(wpm, accuracy, `${elapsedTime.toFixed(2)}s`);
+        const cps = elapsedTime > 0 ? currentIndex / elapsedTime : 0;
+        showSummary(wpm, accuracy, `${elapsedTime.toFixed(2)}s`, cps);
     }
 
     // --- UI & State Updaters ---

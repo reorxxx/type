@@ -40,15 +40,26 @@ body {
     position: relative; /* Set positioning context */
 }
 
+.stat-item {
+    flex: 1; /* Each item takes up equal space */
+    text-align: center; /* Center the text inside */
+}
+
 .container.loaded {
     opacity: 1; /* Visible when content is ready */
 }
 
 .stats {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     font-size: 1.5rem;
     flex-shrink: 0;
+    width: 100%; /* Ensure it takes full width of the container */
+    margin-bottom: 2rem; /* Remove auto left/right margins */
+    border: 2px solid transparent;
+    border-radius: 0.5rem;
+    padding: 1rem; /* Add internal padding */
+    box-sizing: border-box;
 }
 
 .stat-value {
@@ -58,31 +69,36 @@ body {
 
 .typing-area {
     flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    position: relative; /* Establishes a positioning context */
     width: 100%;
 }
 
 #text-display {
+    position: absolute;
+    bottom: calc(50% + 2rem); /* Aligns the bottom of the element to the vertical center */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    padding-bottom: 2rem; /* Creates a gap from the midline */
+    
+    /* Flex properties for its own content */
     line-height: 1.6;
     display: flex;
     flex-wrap: wrap;
-    justify-content: center; /* Center content horizontally */
-    align-items: center; /* Center single lines vertically */
+    justify-content: center;
+    align-items: center;
     gap: 0.5rem;
-    position: relative;
     color: var(--text-color);
-    align-content: center; /* Center multiple lines vertically as a block */
-    min-height: 0; /* Allow the element to shrink smaller than its content */
-    padding-bottom: 2rem; /* Align to bottom of midline */
+    align-content: center;
 }
 
 .bottom-panel {
-    flex-shrink: 0;
-    width: 100%; /* Ensure it takes full width */
-    position: relative; /* Set as positioning context */
+    position: absolute;
+    top: 50%; /* Aligns the top of the element to the vertical center */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    padding-top: 1rem; /* Creates a gap from the midline */
 }
 
 
@@ -109,8 +125,14 @@ body {
 
 /* == Styles for Words Mode == */
 #text-display:not(.letters-mode) {
-    justify-content: center; /* Center the whole text block */
+    justify-content: flex-start; /* Align to the left */
     gap: 0; /* Remove gap to connect underlines */
+    border: 2px solid var(--key-bg);
+    border-radius: 0.5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 1rem;
+    box-sizing: border-box;
 }
 
 #text-display:not(.letters-mode) .word {
@@ -155,8 +177,11 @@ body {
 
 /* A previously incorrect character that has been corrected */
 #text-display:not(.letters-mode) .corrected-error {
-    color: var(--primary-color); /* Red text for corrected errors */
     border-bottom-color: var(--primary-color); /* Keep underline red to mark historical error */
+}
+/* Also target the inner letter span to ensure its color changes */
+#text-display:not(.letters-mode) .corrected-error .letter {
+    color: var(--primary-color); /* Red text for corrected errors */
 }
 
 /* Ensure spaces that are marked incorrect also get a solid red underline */
@@ -240,7 +265,7 @@ body {
 .start-prompt {
     position: absolute;
     bottom: 100%; /* Align bottom of prompt to top of parent */
-    margin-bottom: 0.1rem; /* Add the small gap */
+    margin-bottom: -0.4rem; /* Move down by 0.5rem */
     left: 50%;
     transform: translateX(-50%);
     width: 100%;

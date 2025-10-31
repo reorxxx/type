@@ -1,42 +1,41 @@
 const performanceLevels = [
-    { title: "打字速度 1 级", icon: "🐌", subtitle: "万事开头难，坚持就是胜利！", className: "level-1" },
-    { title: "打字速度 2 级", icon: "🌱", subtitle: "很棒的开始，手指开始熟悉键盘了。", className: "level-2" },
-    { title: "打字速度 3 级", icon: "📈", subtitle: "看到了明显的进步，继续保持！", className: "level-3" },
-    { title: "打字速度 4 级", icon: "👍", subtitle: "速度越来越快，错误率也在降低。", className: "level-4" },
-    { title: "打字速度 5 级", icon: "🎉", subtitle: "你已经超过了平均水平，为你喝彩！", className: "level-5" },
-    { title: "打字速度 6 级", icon: "💧", subtitle: "行云流水，打字对你来说变得轻松自如。", className: "level-6" },
-    { title: "打字速度 7 级", icon: "😎", subtitle: "你已是一位打字高手，展现出了真正的实力。", className: "level-7" },
-    { title: "打字速度 8 级", icon: "⚡️", subtitle: "快如闪电！你的手指在键盘上飞舞。", className: "level-8" },
-    { title: "打字速度 9 级", icon: "🕺", subtitle: "这不仅是打字，更像是一场指尖上的舞蹈。", className: "level-9" },
-    { title: "打字速度 10 级", icon: "👑", subtitle: "登峰造极！你就是当之无愧的键盘之王！", className: "level-10" }
+    { minSpeed: 0,    maxSpeed: 1,    title: "1级", message: "加油哦！你太棒了，继续！" },
+    { minSpeed: 1,    maxSpeed: 1.2,  title: "2级", message: "进步了！保持练习！" },
+    { minSpeed: 1.2,  maxSpeed: 1.8,  title: "3级", message: "加油哦！你太棒了，继续!！" },
+    { minSpeed: 1.8,  maxSpeed: 2,    title: "4级", message: "很好！速度在提升，继续！" },
+    { minSpeed: 2,    maxSpeed: 2.2,  title: "5级", message: "厉害了！你已经很熟练了！！" },
+    { minSpeed: 2.2,  maxSpeed: 2.6,  title: "6级", message: "优秀！你的速度很快！继续！" },
+    { minSpeed: 2.6,  maxSpeed: 3,    title: "7级", message: "太棒了！你是打字高手" },
+    { minSpeed: 3,    maxSpeed: 4,    title: "8级", message: "你的速度超过90%的人类了！" },
+    { minSpeed: 4,    maxSpeed: 4.2,  title: "9级", message: "超神！你是打字之王！" },
+    { minSpeed: 4.2,  maxSpeed: Infinity, title: "10级", message: "你已经超越人类极限了!!！" }
 ];
 
-function calculatePerformanceLevel(wpm, accuracy) {
-    if (accuracy < 80) return 0;
-    if (accuracy < 90) return wpm < 30 ? 1 : 2;
-    if (wpm < 20) return 1;
-    if (wpm < 30) return 2;
-    if (wpm < 40) return 3;
-    if (wpm < 50) return 4;
-    if (wpm < 60) return 5;
-    if (wpm < 70) return 6;
-    if (wpm < 80) return 7;
-    if (wpm < 100) return 8;
-    return 9;
+function calculatePerformanceLevel(cps) {
+    // The new level calculation is based on Characters Per Second (CPS)
+    // and does not consider accuracy for rating.
+    for (let i = performanceLevels.length - 1; i >= 0; i--) {
+        if (cps >= performanceLevels[i].minSpeed) {
+            // Add a class name for styling, similar to the old system
+            return { ...performanceLevels[i], className: `level-${i + 1}` };
+        }
+    }
+    return { ...performanceLevels[0], className: "level-1" };
 }
 
-function showSummary(wpm, accuracy, time) {
-    const levelIndex = calculatePerformanceLevel(wpm, accuracy);
-    const levelData = performanceLevels[levelIndex];
+function showSummary(wpm, accuracy, time, cps) {
+    const levelData = calculatePerformanceLevel(cps);
 
     $('#summary-wpm').text(wpm);
     $('#summary-accuracy').text(`${accuracy}%`);
     $('#summary-time').text(time);
-    $('#summary-title').html(`${levelData.icon} ${levelData.title} ${levelData.icon}`);
-    $('#summary-subtitle').text(levelData.subtitle);
+    $('#summary-title').html(`${levelData.title}`);
+    $('#summary-subtitle').text(levelData.message);
     
     const $summaryContent = $('#summary-content');
-    $summaryContent.removeClass(performanceLevels.map(p => p.className).join(' ')).addClass(levelData.className);
+    // Generate a list of all possible level classes to remove them all
+    const allLevelClasses = performanceLevels.map((p, i) => `level-${i + 1}`).join(' ');
+    $summaryContent.removeClass(allLevelClasses).addClass(levelData.className);
 
     $('#summary-modal').addClass('visible');
     $('#restart-btn').addClass('v-hidden');
