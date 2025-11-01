@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>校外端原型 v5 - 门户页</title>
+    <title>TypingFun - 校外版 (已修复)</title>
     <style>
-        /* ... 样式代码与v5版本完全相同 ... */
-        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f8f9fa; color: #343a40; }
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, "PingFang SC", "Microsoft YaHei"; background-color: #f8f9fa; color: #343a40; }
         .page { display: none; }
         .page.active { display: block; }
         a { text-decoration: none; color: #007bff; }
@@ -43,8 +42,8 @@
     </style>
 </head>
 <body>
-    <!-- 门户首页 (页面 1) -->
-    <div id="page-portal-home-v5" class="page active">
+
+    <div id="page-portal-home" class="page active">
         <header class="main-header"><div class="logo">TypingFun</div></header>
         <div class="home-layout">
             <div class="home-content">
@@ -61,8 +60,7 @@
                     <div id="tab-password" class="tab-content active">
                         <h3>学生登录</h3>
                         <input type="text" placeholder="账号/手机号"><input type="password" placeholder="密码">
-                        <!-- MODIFIED HERE -->
-                        <button class="button button-primary" style="width: 100%;" onclick="window.location.href='./学生校外登录后.html'">登 录</button>
+                        <button class="button button-primary" style="width: 100%;" onclick="window.location.href='./学生校外已登录.html'">登 录</button>
                     </div>
                     <div id="tab-qrcode" class="tab-content">
                         <div class="qr-code-placeholder"></div><p style="text-align: center; font-size: 0.9em;">请使用家长端小程序扫码登录</p>
@@ -71,6 +69,52 @@
             </div>
         </div>
     </div>
-    <!-- 其他页面 (游客体验区, 测试页) 保持不变，但可以删除，因为这个文件只作为门户 -->
+    
+    <div id="page-guest-experience" class="page">
+        <header class="main-header"><div class="logo" onclick="navigateTo('page-portal-home')">TypingFun</div></header>
+        <div class="page-title">
+             <h1>内容中心</h1>
+             <p style="color: #6c757d;">在这里你可以体验我们的核心功能。登录后可解锁全部内容并保存你的所有成绩！</p>
+        </div>
+        <div class="container">
+            <div class="content-grid">
+                <div class="content-card" onclick="navigateTo('page-typing-test')"><div class="icon">⏱️</div><h3>速度测试</h3><p>挑战你的极限速度(WPM)和准确率。</p></div>
+                <div class="content-card" onclick="alert('进入拼音学习模块...')"><div class="icon">🔤</div><h3>拼音学习</h3><p>根据教材同步，练习声母、韵母和整体认读。</p></div>
+                <div class="content-card" onclick="alert('进入单词学习模块...')"><div class="icon">🔠</div><h3>单词学习</h3><p>同步小学英语教材，边打字边背单词。</p></div>
+                <div class="content-card" onclick="alert('进入诗词赏析模块...')"><div class="icon">📜</div><h3>诗词赏析</h3><p>在优美的诗词中，感受汉字之美与打字韵律。</p></div>
+                <div class="content-card" onclick="alert('进入绘本阅读模块...')"><div class="icon">📚</div><h3>绘本阅读</h3><p>通过跟打绘本故事，提升阅读和打字兴趣。</p></div>
+                <div class="content-card" onclick="alert('进入游戏中心...')"><div class="icon">🎮</div><h3>打字游戏</h3><p>多款趣味游戏，让练习不再枯燥！</p></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-typing-test" class="page">
+         <header class="main-header"><div class="logo" onclick="navigateTo('page-portal-home')">TypingFun</div><div><a href="#" onclick="navigateTo('page-guest-experience')">返回内容中心</a></div></header>
+        <div class="container">
+            <div class="test-panel">
+                <h2 style="text-align:center;">打字速度测试 (1分钟)</h2>
+                <div class="stats-bar"><div class="stat"><div class="value">0</div><p>速度 (WPM)</p></div><div class="stat"><div class="value">100%</div><p>准确率</p></div><div class="stat"><div class="value">01:00</div><p>倒计时</p></div><div class="stat"><div class="value">0</div><p>错误数</p></div></div>
+                <div class="typing-test-area">The quick brown fox jumps over the lazy dog. This is a simple typing test for all users.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 恢复了navigateTo函数 ---
+        function navigateTo(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function switchTab(tabId) {
+            const loginPanel = document.querySelector('.login-panel');
+            loginPanel.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            loginPanel.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            const button = loginPanel.querySelector(`.tab-button[onclick="switchTab('${tabId}')"]`);
+            if (button) button.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+    </script>
 </body>
 </html>
