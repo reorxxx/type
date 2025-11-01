@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校外端原型 v5 - 门户页</title>
+    <style>
+        /* ... 样式代码与v5版本完全相同 ... */
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f8f9fa; color: #343a40; }
+        .page { display: none; }
+        .page.active { display: block; }
+        a { text-decoration: none; color: #007bff; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .button { font-size: 1em; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; display: inline-block; }
+        .button-primary { background-color: #007bff; color: white; }
+        .button-lg { padding: 20px 40px; font-size: 1.5em; }
+        .main-header { background: white; padding: 0 5%; display: flex; justify-content: space-between; align-items: center; height: 70px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .main-header .logo { font-size: 1.8em; font-weight: bold; cursor: pointer;}
+        .home-layout { display: flex; align-items: center; justify-content: center; min-height: calc(100vh - 70px); }
+        .home-content { display: grid; grid-template-columns: 1fr 400px; gap: 60px; align-items: center; width: 100%; max-width: 1200px; padding: 40px; }
+        .cta-panel h1 { font-size: 4em; margin-bottom: 20px; }
+        .cta-panel p { font-size: 1.2em; color: #6c757d; margin-bottom: 30px; }
+        .login-panel { background: white; border-radius: 12px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .login-panel .tab-buttons { display: flex; border-bottom: 1px solid #dee2e6; margin-bottom: 20px; }
+        .login-panel .tab-button { flex: 1; text-align: center; padding: 10px; cursor: pointer; background: none; border: none; font-size: 1em; }
+        .login-panel .tab-button.active { font-weight: bold; border-bottom: 2px solid #007bff; }
+        .login-panel .tab-content { display: none; }
+        .login-panel .tab-content.active { display: block; }
+        .login-panel input { width: 100%; box-sizing: border-box; padding: 12px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc; }
+        .qr-code-placeholder { width: 180px; height: 180px; margin: 15px auto; background: #f0f2f5 url('https://via.placeholder.com/180x180/f0f2f5/ccc?text=请用家长小程序扫码') no-repeat center center; }
+        .page-title { text-align: center; padding: 40px 20px; background: white; margin-bottom: 40px;}
+        .page-title h1 { font-size: 3em; margin: 0; }
+        .content-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
+        .content-card { background: white; padding: 30px; border-radius: 12px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+        .content-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+        .content-card .icon { font-size: 3em; margin-bottom: 15px; color: #007bff; }
+        .content-card h3 { font-size: 1.5em; margin-bottom: 10px; }
+        .content-card p { color: #6c757d; }
+        .test-panel { background: white; padding: 40px; border-radius: 12px; max-width: 900px; margin: 40px auto; }
+        .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; text-align: center; margin-bottom: 30px; }
+        .stat .value { font-size: 2.5em; font-weight: bold; }
+        .typing-test-area { background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; font-size: 1.5em; line-height: 1.8; letter-spacing: 2px; font-family: 'Courier New', Courier, monospace; min-height: 200px; }
+    </style>
+</head>
+<body>
+    <!-- 门户首页 (页面 1) -->
+    <div id="page-portal-home-v5" class="page active">
+        <header class="main-header"><div class="logo">TypingFun</div></header>
+        <div class="home-layout">
+            <div class="home-content">
+                <div class="cta-panel">
+                    <h1>妙趣横生的打字之旅</h1>
+                    <p>通过系统化的课程和趣味盎然的游戏，让每一次键盘敲击都成为一次进步。</p>
+                    <a href="#" class="button button-primary button-lg" onclick="navigateTo('page-guest-experience')">来打字吧</a>
+                </div>
+                <div class="login-panel">
+                    <div class="tab-buttons">
+                        <button class="tab-button active" onclick="switchTab('tab-password')">账号登录</button>
+                        <button class="tab-button" onclick="switchTab('tab-qrcode')">扫码登录</button>
+                    </div>
+                    <div id="tab-password" class="tab-content active">
+                        <h3>学生登录</h3>
+                        <input type="text" placeholder="账号/手机号"><input type="password" placeholder="密码">
+                        <!-- MODIFIED HERE -->
+                        <button class="button button-primary" style="width: 100%;" onclick="window.location.href='./学生校外登录后.html'">登 录</button>
+                    </div>
+                    <div id="tab-qrcode" class="tab-content">
+                        <div class="qr-code-placeholder"></div><p style="text-align: center; font-size: 0.9em;">请使用家长端小程序扫码登录</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 其他页面 (游客体验区, 测试页) 保持不变，但可以删除，因为这个文件只作为门户 -->
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生端 Final - 完整无省略版</title>
+    <style>
+        body { margin: 0; font-family: "PingFang SC", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f7fc; color: #343a40; }
+        a { text-decoration: none; color: #4a90e2; }
+        
+        /* --- 整体布局 & 头部 --- */
+        .app-wrapper { display: flex; flex-direction: column; min-height: 100vh; }
+        .main-header { background: white; padding: 0 30px; display: flex; justify-content: space-between; align-items: center; height: 64px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); flex-shrink: 0; z-index: 100; }
+        .app-body { flex-grow: 1; } /* 移除flex和overflow，让内容自然撑开 */
+        .view { display: none; }
+        .view.active { display: block; }
+        .main-header .logo { font-size: 1.8em; font-weight: bold; color: #333; }
+        .main-header nav { flex-grow: 1; text-align: center; }
+        .main-header nav a { margin: 0 20px; font-weight: 500; font-size: 1.1em; color: #555; padding: 20px 0; border-bottom: 3px solid transparent; transition: all 0.2s; cursor: pointer; }
+        .main-header nav a.active { color: #4a90e2; border-bottom-color: #4a90e2; }
+        .user-profile { display: flex; align-items: center; gap: 10px; min-width: 100px; justify-content: flex-end; }
+        .user-profile .avatar { width: 36px; height: 36px; border-radius: 50%; background-color: #e9ecef; }
+        
+        /* --- 主内容区通用 --- */
+        .content-container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .page-title { font-size: 2em; font-weight: 600; margin-bottom:30px; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .card h2 { margin-top: 0; font-size: 1.2em; font-weight: 600; padding-bottom: 15px; margin-bottom: 20px; border-bottom: 1px solid #f0f0f0; }
+        .button { font-size: 1em; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; display: inline-block; }
+
+        /* --- 视图1: 我的首页 --- */
+        .dashboard-grid { display: grid; grid-template-columns: 200px 1fr; gap: 30px; }
+        .side-nav { display: flex; flex-direction: column; gap: 20px; }
+        .nav-card { border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s; background: white; }
+        .nav-card:hover { transform: translateY(-3px); }
+        .nav-card .image-placeholder { height: 100px; display: flex; justify-content: center; align-items: center; }
+        .nav-card .image-placeholder img { height: 60%; }
+        .nav-card .title { font-size: 1em; font-weight: 500; padding: 15px 0; text-align: center; background-color: white; }
+        .dashboard-main { display: flex; flex-direction: column; gap: 30px; }
+        .dashboard-main-layout { display: grid; grid-template-columns: 1fr 320px; gap: 30px; }
+        .chart-placeholder { width: 100%; height: 280px; background-color: #f8f9fa; display: flex; justify-content: center; align-items: center; color: #aaa; border-radius: 8px; }
+        .recommendation-card { background: #667eea; color: white; border-radius: 12px; padding: 25px; }
+        .recommendation-card h2 { color: white; border-bottom: 1px solid rgba(255,255,255,0.3); }
+        .rank-card .rank-value { font-size: 3.5em; font-weight: bold; text-align: center; color: #4a90e2; margin-bottom: 10px; }
+        .rank-card .rank-desc { text-align: center; color: #6c757d; line-height: 1.6; font-size: 0.9em; }
+        .mistake-keys .keys-container { display: flex; gap: 15px; }
+        .mistake-keys .key { display: inline-block; width: 40px; height: 40px; line-height: 40px; text-align: center; background: #fff1f0; border: 1px solid #ffccc7; color: #cf1322; font-weight: 500; border-radius: 6px; font-family: monospace; }
+        
+        /* --- 视图2&3: 学习/游戏中心 --- */
+        .content-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .content-card { background: white; padding: 30px; border-radius: 12px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); cursor: pointer; }
+        .content-card h3 { font-size: 1.5em; }
+
+        /* --- 视图4: 学习历史 --- */
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+        th { background-color: #fafafa; font-weight: 600; font-size: 0.9em; text-transform: uppercase; }
+        .history-item-tag { padding: 4px 10px; font-size: 0.8em; border-radius: 12px; color: white; }
+        .tag-class { background-color: #fd7e14; } .tag-home { background-color: #20c997; }
+        .pagination { text-align: center; margin-top: 30px; }
+        
+        /* --- 视图5: 我的荣誉 --- */
+        .honor-card { margin-bottom: 30px; }
+        .lifetime-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; text-align: center; }
+        .lifetime-stats .value { font-size: 2.8em; font-weight: bold; color: #007bff; }
+        .ranking-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+        .ranking-grid .rank-value { font-size: 2.8em; font-weight: bold; margin: 10px 0; }
+        .rank-change.positive { color: #28a745; } .rank-change.negative { color: #dc3545; }
+        .badge-wall { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 30px; text-align: center; }
+        .badge-item .badge-icon { font-size: 5em; filter: grayscale(1); opacity: 0.3; transition: all 0.3s; }
+        .badge-item .badge-icon.unlocked { filter: grayscale(0); opacity: 1; transform: scale(1.1); }
+        .badge-item .badge-name { font-weight: bold; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="app-wrapper">
+        <header class="main-header">
+            <div class="logo">TypingFun</div>
+            <nav id="top-nav">
+                <a class="active" onclick="switchView('view-dashboard', this)">🌟 我的首页</a>
+                <a onclick="switchView('view-learning-center', this)">🎓 学习中心</a>
+                <a onclick="switchView('view-game-center', this)">🎮 游戏中心</a>
+                <a onclick="switchView('view-history', this)">📖 学习历史</a>
+                <a onclick="switchView('view-honor', this)">🏆 我的荣誉</a>
+            </nav>
+            <div class="user-profile"><div class="avatar"></div><div class="name">李*明</div></div>
+        </header>
+        <div class="app-body">
+            <main class="content-area">
+                <!-- 视图1: 我的首页 (默认) -->
+                <div id="view-dashboard" class="view active">
+                    <div class="content-container">
+                        <h1 class="page-title">我的首页</h1>
+                        <div class="dashboard-grid">
+                            <!-- 左侧边栏 -->
+                            <aside class="side-nav">
+                                <div class="nav-card">
+                                    <div class="image-placeholder" style="background-color: #e6f7ff;"><img src="https://em-content.zobj.net/source/apple/354/stopwatch_23f1-fe0f.png" alt="stopwatch" style="height: 60%;"></div>
+                                    <div class="title">速度测试</div>
+                                </div>
+                                <div class="nav-card">
+                                    <div class="image-placeholder" style="background-color: #fff7e6;"><img src="https://em-content.zobj.net/source/apple/354/input-latin-letters_1f521.png" alt="abc" style="height: 60%;"></div>
+                                    <div class="title">拼音学习</div>
+                                </div>
+                                <div class="nav-card">
+                                    <div class="image-placeholder" style="background-color: #f6ffed;"><img src="https://em-content.zobj.net/source/apple/354/input-latin-uppercase_1f520.png" alt="ABCD" style="height: 60%;"></div>
+                                    <div class="title">单词学习</div>
+                                </div>
+                                <div class="nav-card">
+                                    <div class="image-placeholder" style="background-color: #f9f0ff;"><img src="https://em-content.zobj.net/source/apple/354/scroll_1f4dc.png" alt="scroll" style="height: 60%;"></div>
+                                    <div class="title">诗词赏析</div>
+                                </div>
+                                <div class="nav-card">
+                                    <div class="image-placeholder" style="background-color: #fff1f0;"><img src="https://em-content.zobj.net/source/apple/354/books_1f4da.png" alt="books" style="height: 60%;"></div>
+                                    <div class="title">绘本阅读</div>
+                                </div>
+                            </aside>
+                            <!-- 右侧仪表盘 -->
+                            <div class="dashboard-main">
+                                <div class="dashboard-main-layout">
+                                    <div class="card"><h2>最近一周数据</h2><div class="chart-placeholder">[ 练习时长、速度、正确率的图表 ]</div></div>
+                                    <div class="card">
+                                        <div class="rank-card"><h2>班级排名</h2><div class="rank-value">No. 2</div><p class="rank-desc">太棒了！你的打字速度排在班级第二名，仅次于王*红同学。</p></div>
+                                        <div class="mistake-keys" style="margin-top:30px;"><h2>常错按键</h2><div class="keys-container"><span class="key">E</span><span class="key">R</span></div></div>
+                                    </div>
+                                </div>
+                                <div class="recommendation-card"><h2>智能推荐</h2><p style="opacity:0.9;">你的准确率非常高，太棒了！要不要挑战一下【速度测试】，看看你的极限在哪里？</p></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 视图2: 学习中心 -->
+                <div id="view-learning-center" class="view">
+                    <div class="content-container">
+                        <h1 class="page-title">学习中心</h1>
+                        <div class="content-grid">
+                            <div class="card content-card"><h3>速度测试</h3><p>挑战你的极限速度和准确率。</p></div>
+                            <div class="card content-card"><h3>拼音学习</h3><p>根据教材同步，练习声母韵母。</p></div>
+                            <div class="card content-card"><h3>单词学习</h3><p>同步小学英语教材，边打字边背单词。</p></div>
+                            <div class="card content-card"><h3>诗词赏析</h3><p>在优美的诗词中感受汉字之美。</p></div>
+                            <div class="card content-card"><h3>绘本阅读</h3><p>通过跟打绘本故事提升兴趣。</p></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 视图3: 游戏中心 -->
+                <div id="view-game-center" class="view">
+                    <div class="content-container">
+                        <h1 class="page-title">游戏中心</h1>
+                        <div class="content-grid">
+                            <div class="card content-card"><h3>太空字母</h3><p>从天而降的字母雨！</p></div>
+                            <div class="card content-card"><h3>单词打地鼠</h3><p>快速敲击对应的字母地鼠。</p></div>
+                            <div class="card content-card"><h3>打字赛车手</h3><p>打字越快，车速越快！</p></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 视图4: 学习历史 -->
+                <div id="view-history" class="view">
+                    <div class="content-container">
+                        <h1 class="page-title">我的学习历史</h1>
+                        <table>
+                           <thead><tr><th>练习时间</th><th>练习内容</th><th>场景</th><th>时长</th><th>速度(WPM)</th><th>正确率</th><th>操作</th></tr></thead>
+                           <tbody>
+                               <tr><td>2025-11-01 10:15</td><td>课堂速度测试</td><td><span class="history-item-tag tag-class">课堂</span></td><td>5分00秒</td><td>68</td><td>99%</td><td><a href="#">查看详情</a></td></tr>
+                               <tr><td>2025-10-31 20:30</td><td>诗词赏析 - 《静夜思》</td><td><span class="history-item-tag tag-home">课外</span></td><td>2分10秒</td><td>65</td><td>100%</td><td><a href="#">查看详情</a></td></tr>
+                           </tbody>
+                        </table>
+                        <div class="pagination" style="text-align: center; margin-top: 30px;"><a href="#">&laquo;</a><a href="#" style="background-color: #4a90e2; color: white; border-color: #4a90e2; padding: 8px 12px; border: 1px solid #dee2e6; border-radius: 4px;">1</a><a href="#" style="padding: 8px 12px; border: 1px solid #dee2e6; background: white; border-radius: 4px;">2</a><a href="#">&raquo;</a></div>
+                    </div>
+                </div>
+
+                <!-- 视图5: 我的荣誉 -->
+                <div id="view-honor" class="view">
+                    <div class="content-container">
+                        <h1 class="page-title">我的荣誉</h1>
+                        <div class="card honor-card">
+                            <h2>我的成就总览</h2>
+                            <div class="lifetime-stats" style="text-align: center;">
+                                <div class="stat-item"><div class="value">35.5</div><div class="label" style="color: #6c757d; font-size: 1.1em;">总计学习(小时)</div></div>
+                                <div class="stat-item"><div class="value">10,240</div><div class="label" style="color: #6c757d; font-size: 1.1em;">累计打字(字)</div></div>
+                                <div class="stat-item"><div class="value">4</div><div class="label" style="color: #6c757d; font-size: 1.1em;">获得徽章(枚)</div></div>
+                            </div>
+                        </div>
+                        <div class="card honor-card">
+                            <h2>我的班级排名</h2>
+                            <div class="ranking-grid" style="text-align:center;">
+                                <div class="rank-showcase-card"><h3>速度排名</h3><div class="rank-value" style="font-size:2.8em;">No. 2</div><div class="rank-change positive">↑ 上升1名</div></div>
+                                <div class="rank-showcase-card"><h3>时长排名</h3><div class="rank-value" style="font-size:2.8em;">No. 5</div><div class="rank-change negative">↓ 下降2名</div></div>
+                                <div class="rank-showcase-card"><h3>正确率排名</h3><div class="rank-value" style="font-size:2.8em;">No. 1</div><div class="rank-change">-- 保持</div></div>
+                            </div>
+                        </div>
+                        <div class="card honor-card">
+                            <h2>我的徽章墙</h2>
+                            <div class="badge-wall">
+                                <div class="badge-item"><div class="badge-icon unlocked">🗓️</div><div class="badge-name">全勤标兵</div></div>
+                                <div class="badge-item"><div class="badge-icon unlocked">⚡️</div><div class="badge-name">快如闪电</div></div>
+                                <div class="badge-item"><div class="badge-icon unlocked">🎯</div><div class="badge-name">精准打击</div></div>
+                                <div class="badge-item"><div class="badge-icon unlocked">🗺️</div><div class="badge-name">探险家</div></div>
+                                <div class="badge-item"><div class="badge-icon">🏎️</div><div class="badge-name">音速小子</div></div>
+                                <div class="badge-item"><div class="badge-icon">✍️</div><div class="badge-name">文学家</div></div>
+                                <div class="badge-item"><div class="badge-icon">💪</div><div class="badge-name">持之以恒</div></div>
+                                <div class="badge-item"><div class="badge-icon">✨</div><div class="badge-name">神秘徽章</div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script>
+        function switchView(viewId, navElement) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            if (navElement) {
+                document.querySelectorAll('#top-nav a').forEach(a => a.classList.remove('active'));
+                navElement.classList.add('active');
+            }
+            // 这是最终版逻辑
+            const isDashboard = (viewId === 'view-dashboard');
+            const sideNav = document.querySelector('.side-nav');
+            const mainContent = document.querySelector('.content-area');
+            if(sideNav) { // check if sidenav exists to prevent errors
+                sideNav.style.display = isDashboard ? 'flex' : 'none';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校内端原型 v4 - 支持重复练习</title>
+    <style>
+        /* --- 继承自 v3 的样式... --- */
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f0f2f5; color: #333; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .page { display: none; width: 100%; max-width: 1000px; height: 90vh; max-height: 700px; background-color: #fff; border-radius: 12px; box-shadow: 0 4px
+ 12px rgba(0,0,0,0.1); overflow: hidden; flex-direction: column; }
+        .page.active { display: flex; }
+        .container { padding: 40px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; box-sizing: border-box; }
+        h1 { font-size: 2.2em; color: #1f1f1f; margin-bottom: 10px; }
+        p { color: #666; font-size: 1.1em; }
+        input, select { font-size: 1.2em; padding: 12px 18px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; width: 300px; text-align: center; }
+        select { text-align-last: center; }
+        .button { font-size: 1em; padding: 10px 25px; border-radius: 8px; border: 1px solid transparent; cursor: pointer; text-decoration: none; }
+        .button-primary { background-color: #1a73e8; color: white; border-color: #1a73e8; }
+        .button-secondary { background-color: white; color: #333; border-color: #d9d9d9; }
+        .button-secondary:hover { background-color: #f5f5f5; }
+        .login-button { font-size: 1.2em; padding: 12px 30px; margin-top: 20px; }
+        .header { width: 100%; padding: 15px 30px; display: flex; justify-content: flex-end; align-items: center; background-color: #fafafa; border-bottom: 1px solid #e0e0e0; box-sizing: border-box; flex-shrink: 0; }
+        .header .user-info { font-weight: bold; }
+        .task-board { flex-grow: 1; width: 100%; padding: 20px; box-sizing: border-box; overflow-y: auto; }
+        .task-list { list-style: none; padding: 0; margin: 0; }
+        .task-item { display: flex; justify-content: space-between; align-items: center; background-color: #f7f9fa; border: 1px solid #e8e8e8; border-radius: 8px; padding: 20px; margin-bottom: 15px; }
+        .task-item .info { text-align: left; }
+        .task-item .title { font-size: 1.5em; font-weight: 500; margin: 0 0 5px 0; }
+        .task-item .desc { color: #666; margin: 0; }
+        .task-item .status-action-group { text-align: right; }
+        .status-completed { color: #52c41a; font-weight: bold; display: block; margin-bottom: 8px; }
+        .practice-area { flex-grow: 1; width: 100%; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; }
+        .stats-bar { display: flex; justify-content: space-around; padding: 15px; background-color: #f7f7f7; border-radius: 8px; margin-bottom: 20px; }
+        .stat { text-align: center; }
+        .stat .value { font-size: 1.8em; font-weight: bold; color: #1a73e8; }
+        .stat .label { font-size: 0.9em; color: #666; }
+        .text-display-area { background-color: #fafafa; border: 1px solid #ddd; border-radius: 8px; padding: 20px; font-size: 1.8em; letter-spacing: 2px; line-height: 1.6; flex-grow: 1; font-family: 'Courier New', Courier, monospace; }
+        
+    </style>
+</head>
+<body>
+
+    <!-- 页面 1: 输入班级码 -->
+    <div id="page-class-login" class="page active">
+        <div class="container">
+            <h1>课堂辅助练习</h1>
+            <p>请输入老师提供的班级邀请码</p>
+            <input type="text" placeholder="班级邀请码" maxlength="6">
+            <a href="#" class="button button-primary login-button" onclick="navigateTo('page-class-select-student')">进入课堂</a>
+        </div>
+    </div>
+    
+    <!-- 页面 2: 选择姓名 -->
+    <div id="page-class-select-student" class="page">
+        <div class="container">
+            <h1>你是谁？</h1>
+            <p>请在下方列表中选择你的名字</p>
+            <select>
+                <option>-- 请选择你的名字 --</option>
+                <option>李*明</option>
+                <option>王*红</option>
+                <option>张*伟</option>
+            </select>
+            <input type="password" placeholder="请输入4位个人密码" maxlength="4" style="text-align: center; letter-spacing: 1em;">
+            <a href="#" class="button button-primary login-button" onclick="navigateTo('page-class-tasks')">确认身份，进入任务</a>
+        </div>
+    </div>
+
+    <!-- 页面 3: 课堂任务板 -->
+    <div id="page-class-tasks" class="page">
+        <div class="header">
+            <div class="user-info">李*明 - 三年级(1)班</div>
+        </div>
+        <div class="task-board">
+            <h1 style="text-align: center; margin-top: 0;">今日课堂任务</h1>
+            <ul class="task-list">
+                <li class="task-item">
+                    <div class="info">
+                        <h2 class="title">1. 基准键位练习</h2>
+                        <p class="desc">练习 ASDF JKL; 这8个基础按键。</p>
+                    </div>
+                    <div class="status-action-group">
+                        <span class="status-completed">已完成 ✓ (最高: 50 WPM)</span>
+                        <a href="#" class="button button-secondary" onclick="navigateTo('page-class-practice')">再次练习</a>
+                    </div>
+                </li>
+                 <li class="task-item">
+                    <div class="info">
+                        <h2 class="title">2. 食指与中指练习</h2>
+                        <p class="desc">练习范围扩展到 ERUI DCFV。</p>
+                    </div>
+                    <div>
+                        <a href="#" class="button button-primary" onclick="navigateTo('page-class-practice')">开始练习</a>
+                    </div>
+                </li>
+                <li class="task-item">
+                    <div class="info">
+                        <h2 class="title">3. 课堂速度测试</h2>
+                        <p class="desc">一篇包含所有字母的短文，限时5分钟。</p>
+                    </div>
+                    <div>
+                         <a href="#" class="button button-primary" onclick="navigateTo('page-class-practice')">开始测试</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 页面 4: 练习/测评界面 -->
+    <div id="page-class-practice" class="page">
+        <div class="header"><div class="user-info">李*明 - 三年级(1)班</div></div>
+        <div class="practice-area">
+             <div class="stats-bar">
+                <div class="stat"><div class="value">0</div><div class="label">速度 WPM</div></div>
+                <div class="stat"><div class="value">100%</div><div class="label">正确率</div></div>
+                <div class="stat"><div class="value">05:00</div><div class="label">剩余时间</div></div>
+            </div>
+            <div class="text-display-area">The quick brown fox jumps over the lazy dog.</div>
+            <p style="text-align:center; margin-top:20px;"><a href="#" class="button button-primary login-button" onclick="navigateTo('page-class-result')">(模拟) 完成练习</a></p>
+        </div>
+    </div>
+
+    <!-- 页面 5: 练习结果页 -->
+     <div id="page-class-result" class="page">
+        <div class="header"><div class="user-info">李*明 - 三年级(1)班</div></div>
+        <div class="container">
+            <h1 style="color: #28a745;">练习完成！</h1>
+            <div style="display: flex; gap: 50px; margin: 30px 0;">
+                <div class="stat"><div class="value">68</div><div class="label">最终速度 WPM</div></div>
+                <div class="stat"><div class="value">99%</div><div class="label">最终正确率</div></div>
+            </div>
+            <a href="#" class="button button-primary login-button" onclick="navigateTo('page-class-tasks')">返回任务列表</a>
+        </div>
+    </div>
+
+    <script>
+        function navigateTo(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+        }
+    </script>
+</body>
+</html>
